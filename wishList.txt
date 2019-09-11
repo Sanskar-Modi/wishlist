@@ -1,0 +1,29 @@
+    public void addToCartFromWishList(Long wishlistId) {
+
+ 
+
+        Optional<WishList> wishList = wishListDao.findById(wishlistId);
+
+ 
+
+        List<Product> pr = wishList.get().getProducts();
+        long prodId = 0;
+        for (Product product : pr) {
+            prodId = product.getProductId();
+        }
+        Customer cs = wishList.get().getCustomer();
+        long custId = cs.getCustomerId();
+        Optional<Product> prod = productDao.findById(prodId);
+        Optional<Customer> cust = custDao.findById(custId);
+        long customerId = cust.get().getCustomerId();
+        Product product = prod.get();
+        List<Product> products = new ArrayList<>();
+        products.add(product);
+        if (cust.isPresent() && prod.isPresent()) {
+            Cart cart = new Cart();
+            cart.setProducts(products);
+            cart.setCustomerId(customerId);
+            cartDao.save(cart);
+            wishListDao.deleteById(wishlistId);
+        }
+    }
